@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>PAC</title>
+  <style>
+    #chatArea {
+      max-height: 90vh;
+      overflow: auto
+    }
+
+    .inputMessage {
+      border: 0;
+      padding: 10px;
+      width: 90%;
+      margin-right: .5%;
+    }
+  </style>
+</head>
+
+<body>
+  <script src="https://gitcdn.link/repo/eosterberg/terminaljs/master/terminal.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+  <script>
+    //start socketio
+    var socket = io();
+    //findes token key
+    var key = location.pathname
+    key = key.replace('/', '')
+    var t1 = new Terminal()
+    window.onload = function () {
+      document.getElementById("chatArea").appendChild(t1.html)
+    }
+    socket.on('line', function (data) {
+      let ff = document.getElementById('chatArea')
+      if (ff.scrollTop == ff.scrollHeight) {
+        t1.print(data);
+        ff.scrollTop = ff.scrollHeight
+      }
+      console.log(data)
+    });
+
+    window.onkeydown = event => {
+      if (event.which === 13) {
+        if (document.getElementById("input").value !== "") {
+          socket.emit('command', [document.getElementById("input").value, key]);
+          document.getElementById('input').value = '';
+        }
+      }
+    }
+  </script>
+
+  <li class="chat page">
+    <div id="chatArea">
+      <ul class="messages"></ul>
+      <div></div>
+    </div>
+
+  </li>
+  <input class="inputMessage" id="input" placeholder="Type here..." />
+</body>
+
+</html>
